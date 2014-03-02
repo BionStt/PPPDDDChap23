@@ -39,30 +39,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model\Baskets\Basket.cs" />
-    <Compile Include="Model\Baskets\BasketItem.cs" />
-    <Compile Include="Model\Baskets\BasketItemFactory.cs" />
-    <Compile Include="Model\Baskets\BasketPricingBreakdown.cs" />
-    <Compile Include="Model\Baskets\BasketPricingService.cs" />
-    <Compile Include="Model\Baskets\Events\BasketCreated.cs" />
-    <Compile Include="Model\Baskets\Events\BasketModified.cs" />
-    <Compile Include="Model\Baskets\Events\BasketPriceChanged.cs" />
-    <Compile Include="Model\Baskets\Events\CouponNotApplicableForBasketItems.cs" />
-    <Compile Include="Model\Baskets\IBasketPricingService.cs" />
-    <Compile Include="Model\Baskets\IBasketRepository.cs" />
-    <Compile Include="Model\Baskets\NonNegativeQuantity.cs" />
-    <Compile Include="Model\Baskets\ProductSnapshot.cs" />
-    <Compile Include="Model\Promotions\Coupon.cs" />
-    <Compile Include="Model\Promotions\CouponIssues.cs" />
-    <Compile Include="Model\Promotions\ICouponPolicy.cs" />
-    <Compile Include="Model\Promotions\IPromotionsRepository.cs" />
-    <Compile Include="Model\Promotions\Promotion.cs" />
-    <Compile Include="Model\Promotions\PromotionNotApplicableException.cs" />
+    <Compile Include="Infrastructure\Entity.cs" />
+    <Compile Include="Infrastructure\EventSourcedAggregate.cs" />
+    <Compile Include="Infrastructure\IDomainEvent.cs" />
+    <Compile Include="Infrastructure\ValueObject.cs" />
+    <Compile Include="Model\Orders\DispatchAddress.cs" />
+    <Compile Include="Model\Orders\IOpenOrderRepository.cs" />
+    <Compile Include="Model\Orders\Item.cs" />
+    <Compile Include="Model\Orders\OpenOrder.cs" />
+    <Compile Include="Model\Orders\OrderCreated.cs" />
+    <Compile Include="Model\Orders\OrderItem.cs" />
+    <Compile Include="Model\Products\Product.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Application\" />
-    <Folder Include="Infrastructure\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
