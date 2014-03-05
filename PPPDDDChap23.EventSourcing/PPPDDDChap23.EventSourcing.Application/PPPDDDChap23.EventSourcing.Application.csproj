@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Application\BusinessUseCases\TopUpCredit.cs" />
     <Compile Include="Infrastructure\Entity.cs" />
     <Compile Include="Infrastructure\EventSourcedAggregate.cs" />
     <Compile Include="Infrastructure\IDomainEvent.cs" />
@@ -49,11 +50,11 @@
     <Compile Include="Model\Orders\OpenOrder.cs" />
     <Compile Include="Model\Orders\OrderCreated.cs" />
     <Compile Include="Model\Orders\OrderItem.cs" />
-    <Compile Include="Model\Products\Product.cs" />
+    <Compile Include="Model\PayAsYouGo\PayAsYouGoAccount.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Application\" />
+    <Folder Include="Application\Queries\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

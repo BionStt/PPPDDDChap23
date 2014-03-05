@@ -81,18 +81,10 @@ namespace PPPDDDChap23.EventSourcing.Application.Model.Orders
 
         public void AddDiscount() // Apply to entire order, reason for the adjustment.
         { }
-
-        public void ChangeShippingAddress() // Throw Exception if trying to change country
-        { }
-
-        public void Cancel()
-        { 
-        
-        }
-
+      
         public void SubmitOrder()
         { 
-           
+           //Determine if we have reached the minimum order value.
         }
     }
 }
