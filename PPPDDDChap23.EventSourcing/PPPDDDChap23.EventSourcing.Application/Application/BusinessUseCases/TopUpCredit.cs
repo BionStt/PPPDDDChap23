@@ -1,59 +1,43 @@
 ﻿using System;
-using DDDPPP.Chap19.RavenDBExample.Application.Model.Auction;
-using DDDPPP.Chap19.RavenDBExample.Application.Model.BidHistory;
+using PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo;
 using Raven.Client;
 using Raven.Abstractions.Exceptions;
-using DDDPPP.Chap19.RavenDBExample.Application.Infrastructure;
+using PPPDDDChap23.EventSourcing.Application.Infrastructure;
 
-namespace DDDPPP.Chap19.RavenDBExample.Application.Application.BusinessUseCases
+namespace PPPDDDChap23.EventSourcing.Application.Application.BusinessUseCases
 {
     public class TopUpCredit
     {
-        private IOpenOrderRepository _openOrderRepository;
+        private IPayAsYouGoAccountRepository _payAsYouGoAccountRepository;
         private IDocumentSession _unitOfWork;
 
-        public BidOnAuction(IOpenOrderRepository openOrderRepository,
+        public TopUpCredit(IPayAsYouGoAccountRepository payAsYouGoAccountRepository,
                             IDocumentSession unitOfWork)
         {
-            _openOrderRepository = openOrderRepository;
+            _payAsYouGoAccountRepository = payAsYouGoAccountRepository;
             _unitOfWork = unitOfWork;
         }
 
-        public void Execute(Guid auctionId, Guid memberId, decimal amount)
+        public void Execute(Guid id)
         {
             try
-            {                                
-                var order = new OpenOrder(auctionId);
+            {
+                var account = _payAsYouGoAccountRepository.FindBy(id);
 
-                var bidAmount = new Money(amount);
+                var credit = new Money();
 
-                auction.PlaceBidFor(new Offer(memberId, bidAmount, _clock.Time()), _clock.Time());
-                                
+                account.TopUp(credit); 
+
+                _payAsYouGoAccountRepository.Save(account);
+                                               
                 _unitOfWork.SaveChanges();         
             }
             catch (ConcurrencyException ex)
             {
                 _unitOfWork.Advanced.Clear();
-                Bid(auctionId, memberId, amount);
+
+                Execute(id);
             }
-        }
-
-        private Action<BidPlaced> BidPlaced()
-        {
-            return (BidPlaced e) =>
-            {               
-                var bidEvent = new Bid(e.AuctionId, e.Bidder, e.AmountBid, e.TimeOfBid);
-              
-                _bidHistory.Add(bidEvent);
-            };
-        }
-
-        private Action<OutBid> OutBid()
-        {
-            return (OutBid e) =>
-            {
-                // Email customer to say that he has been out bid                
-            };
         }
     }
 }

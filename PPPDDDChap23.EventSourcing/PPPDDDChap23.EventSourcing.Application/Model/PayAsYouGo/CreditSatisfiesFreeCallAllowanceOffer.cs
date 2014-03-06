@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PPPDDDChap23.EventSourcing.Application.Model.Orders
+namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
 {
-    public class DispatchAddress
+    public class CreditSatisfiesFreeCallAllowanceOffer
     {
     }
 }
