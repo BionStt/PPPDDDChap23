@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo;
 using Raven.Client;
 using Raven.Abstractions.Exceptions;
@@ -6,38 +10,38 @@ using PPPDDDChap23.EventSourcing.Application.Infrastructure;
 
 namespace PPPDDDChap23.EventSourcing.Application.Application.BusinessUseCases
 {
-    public class TopUpCredit
+    public class RecordPhonecall
     {
         private IPayAsYouGoAccountRepository _payAsYouGoAccountRepository;
         private IDocumentSession _unitOfWork;
 
-        public TopUpCredit(IPayAsYouGoAccountRepository payAsYouGoAccountRepository,
+        public RecordPhonecall(IPayAsYouGoAccountRepository payAsYouGoAccountRepository,
                            IDocumentSession unitOfWork)
         {
             _payAsYouGoAccountRepository = payAsYouGoAccountRepository;
             _unitOfWork = unitOfWork;
         }
 
-        public void Execute(Guid id, decimal amount)
+        public void Execute(Guid id, string phoneNumber, DateTime callStart, int callLengthInMinutes)
         {
-            try
-            {
-                var account = _payAsYouGoAccountRepository.FindBy(id);
+            try{
+                var payAsYouGoAccount = _payAsYouGoAccountRepository.FindBy(id);
 
-                var credit = new Money(amount);
+                var numberDialled = new PhoneNumber(phoneNumber);
+                var phoneCall = new PhoneCall(numberDialled, callStart, callLengthInMinutes);
 
-                account.TopUp(credit); 
+                payAsYouGoAccount.Record(phoneCall, new PhoneCallCosting());
 
-                _payAsYouGoAccountRepository.Save(account);
-                                               
-                _unitOfWork.SaveChanges();         
+                _payAsYouGoAccountRepository.Save(payAsYouGoAccount);
+
+                _unitOfWork.SaveChanges();
             }
             catch (ConcurrencyException ex)
             {
                 _unitOfWork.Advanced.Clear();
 
                 // TODO: Add logic to retry X times then move to an error queue
-                // Execute(id, amount);
+                // Execute(id, phoneNumber, callStart, callLengthInMinutes);
 
                 throw ex;
             }

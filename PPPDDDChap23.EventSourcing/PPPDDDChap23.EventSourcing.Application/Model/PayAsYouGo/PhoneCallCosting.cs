@@ -14,5 +14,10 @@ namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
         // Texts 	14p per text
         // Internet 	£1 per day for 25MB up to a maximum of 125MB per day then charged at 4p per MB thereafter
         // International 	From 5p a minute to standard landlines when you opt in to Vodafone International. Call 36888 for free from your Vodafone mobile 
+
+        public Money DetermineCostOfCall(PhoneCall phoneCall, int numberOfMinutesCoveredByAllowance)
+        {
+            return new Money();
+        }
     }
 }

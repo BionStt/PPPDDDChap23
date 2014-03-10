@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 
 namespace PPPDDDChap23.EventSourcing.Application.Infrastructure
 {
-    public interface IDomainEvent
+    public abstract class DomainEvent
     {
+        public DomainEvent(Guid aggregateId)
+        {
+            Id = aggregateId;
+        }
+
+        public Guid Id { get; private set; }
     }
 }

@@ -8,11 +8,16 @@ namespace PPPDDDChap23.EventSourcing.Application.Infrastructure
 {
     public abstract class EventSourcedAggregate<TId> : Entity<TId>
     {
-        protected List<IDomainEvent> Changes { get; private set; }
+        protected List<DomainEvent> Changes { get; private set; }
 
         public EventSourcedAggregate()
         {
-            Changes = new List<IDomainEvent>();
-        }    
+            Changes = new List<DomainEvent>();
+        }
+
+        public IEnumerable<DomainEvent> GetChanges()
+        {
+            return Changes; 
+        }
     }
 }

@@ -3,13 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PPPDDDChap23.EventSourcing.Application.Infrastructure;
 
 namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
 {
-    public class PhoneCallCharged
+    public class PhoneCallCharged : DomainEvent
     {
-        public Money CostOfCall { get; set; }
+        public PhoneCallCharged(Guid aggregateId, PhoneCall phoneCall, Money costOfCall, int numberOfMinutesCoveredByAllowance) : base (aggregateId)
+        {
+            PhoneCall = phoneCall;
+            CostOfCall = costOfCall;
+            NumberOfMinutesCoveredByAllowance = numberOfMinutesCoveredByAllowance;
+        }
 
-        public int NumberOfMinutesCoveredByAllowance { get; set; }
+        public PhoneCall PhoneCall { get; private set; }
+
+        public Money CostOfCall { get; private set; }
+
+        public int NumberOfMinutesCoveredByAllowance { get; private set; }
     }
 }

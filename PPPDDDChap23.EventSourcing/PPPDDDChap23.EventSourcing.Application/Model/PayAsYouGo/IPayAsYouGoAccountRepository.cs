@@ -9,5 +9,9 @@ namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
     public interface IPayAsYouGoAccountRepository
     {
         PayAsYouGoAccount FindBy(Guid id);
+
+        void Add(PayAsYouGoAccount payAsYouGoAccount);
+
+        void Save(PayAsYouGoAccount payAsYouGoAccount); 
     }
 }

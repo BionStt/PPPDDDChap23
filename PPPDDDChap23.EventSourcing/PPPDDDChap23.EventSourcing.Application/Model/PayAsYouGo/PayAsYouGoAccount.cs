@@ -9,33 +9,43 @@ namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
 {
     public class PayAsYouGoAccount : EventSourcedAggregate<Guid>
     {
-        private Guid _simId;
         private FreeCallAllowance _freeCallAllowance;
         private Money _credit;
 
-        public PayAsYouGoAccount(Guid simId, Money credit)
+        public PayAsYouGoAccount(Guid id, Money credit)
         {
-            Causes(new AccountCreated());          
+            Causes(new AccountCreated(id, credit));          
+        }
+
+        public PayAsYouGoAccount(IEnumerable<DomainEvent> events)
+        {
+            foreach (var @event in events)
+            {
+                When((dynamic)@event);
+            }
         }
 
         public void Record(PhoneCall phoneCall, PhoneCallCosting phoneCallCosting) 
-        {                         
-            var numberOfMinutesCoveredByAllowance = _freeCallAllowance.MinutesWhichCanCover(phoneCall);
+        {       
+            var numberOfMinutesCoveredByAllowance = 0;
+      
+            if (_freeCallAllowance != null)
+                numberOfMinutesCoveredByAllowance = _freeCallAllowance.MinutesWhichCanCover(phoneCall);
 
             var costOfCall = phoneCallCosting.DetermineCostOfCall(phoneCall, numberOfMinutesCoveredByAllowance);
 
-            Causes(new PhoneCallCharged() { PhoneCall = phoneCall, NumberOfMinutesCoveredByAllowance = numberOfMinutesCoveredByAllowance, CostOfCall = costOfCall });
+            Causes(new PhoneCallCharged(this.Id, phoneCall, costOfCall, numberOfMinutesCoveredByAllowance));
         }
 
         public void TopUp(Money credit)
         {
-            if (PayAsYouGoInclusiveMinutesOffer.IsSatisfiedBy(credit))            
-                Causes(new CreditSatisfiesFreeCallAllowanceOffer());            
+            if (new PayAsYouGoInclusiveMinutesOffer().IsSatisfiedBy(credit))            
+                Causes(new CreditSatisfiesFreeCallAllowanceOffer(this.Id));            
 
-            Causes(new CreditAdded() { Credit = credit});
+            Causes(new CreditAdded(this.Id, credit));
         }
 
-        private void Causes(IDomainEvent @event)
+        private void Causes(DomainEvent @event)
         {
             When((dynamic)@event);
             Changes.Add(@event);
@@ -43,24 +53,26 @@ namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
 
         private void When(CreditAdded creditAdded)
         {
-            _credit = _credit.Add(creditAdded);
+            _credit = _credit.Add(creditAdded.Credit);
         }
 
         private void When(CreditSatisfiesFreeCallAllowanceOffer creditSatisfiesFreeCallAllowanceOffer)
         {
-            _plan = new FreeCallAllowance();
+            _freeCallAllowance = new FreeCallAllowance();
         }
 
         private void When(PhoneCallCharged phoneCallCharged)
         {
-            _credit = _credit.Minus(phoneCallCharged.CostOfCall);
-            _freeCallAllowance.Minus(phoneCallCharged.numberOfMinutesCoveredByAllowance);
+            _credit = _credit.Subtract(phoneCallCharged.CostOfCall);
+
+            if (_freeCallAllowance != null)
+                _freeCallAllowance.Subtract(phoneCallCharged.NumberOfMinutesCoveredByAllowance);
         }
 
         private void When(AccountCreated accountCreated)
         {
-            _simId = accountCreated.SimId;
-            _credit = accountCreated.credit;
+            Id = accountCreated.Id;
+            _credit = accountCreated.Credit;
         }
     }
 }
