@@ -17,6 +17,8 @@ namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
 
         public Money DetermineCostOfCall(PhoneCall phoneCall, int numberOfMinutesCoveredByAllowance)
         {
+            // if number starts +44 its UK.
+
             return new Money();
         }
     }
