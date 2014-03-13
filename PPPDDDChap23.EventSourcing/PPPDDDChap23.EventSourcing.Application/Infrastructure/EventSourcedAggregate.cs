@@ -6,18 +6,22 @@ using System.Threading.Tasks;
 
 namespace PPPDDDChap23.EventSourcing.Application.Infrastructure
 {
-    public abstract class EventSourcedAggregate<TId> : Entity<TId>
+    public abstract class EventSourcedAggregate : Entity
     {
         protected List<DomainEvent> Changes { get; private set; }
+        protected int Version { get; set; }
 
         public EventSourcedAggregate()
         {
+            Version = 0;
             Changes = new List<DomainEvent>();
         }
 
-        public IEnumerable<DomainEvent> GetChanges()
+        public EventStream GetChanges()
         {
-            return Changes; 
+            var eventStream = new EventStream(Changes, Version, this.Id);
+
+            return eventStream; 
         }
     }
 }

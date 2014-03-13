@@ -2,9 +2,9 @@
 
 namespace PPPDDDChap23.EventSourcing.Application.Infrastructure
 {
-    public abstract class Entity<TId>
+    public abstract class Entity
     {
-        public TId Id { get; protected set; }
+        public Guid Id { get; protected set; }
         public int Version { get; private set; }
     }
 }

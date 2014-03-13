@@ -7,7 +7,7 @@ using PPPDDDChap23.EventSourcing.Application.Infrastructure;
 
 namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
 {
-    public class PayAsYouGoAccount : EventSourcedAggregate<Guid>
+    public class PayAsYouGoAccount : EventSourcedAggregate
     {
         private FreeCallAllowance _freeCallAllowance;
         private Money _credit;
@@ -17,12 +17,14 @@ namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
             Causes(new AccountCreated(id, credit));          
         }
 
-        public PayAsYouGoAccount(IEnumerable<DomainEvent> events)
+        public PayAsYouGoAccount(EventStream eventStream)
         {
-            foreach (var @event in events)
+            foreach (var @event in eventStream.Events)
             {
                 When((dynamic)@event);
             }
+
+            Version = eventStream.Version;
         }
 
         public void Record(PhoneCall phoneCall, PhoneCallCosting phoneCallCosting) 
