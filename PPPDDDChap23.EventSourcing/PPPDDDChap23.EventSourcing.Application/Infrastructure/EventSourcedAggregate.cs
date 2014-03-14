@@ -9,19 +9,27 @@ namespace PPPDDDChap23.EventSourcing.Application.Infrastructure
     public abstract class EventSourcedAggregate : Entity
     {
         protected List<DomainEvent> Changes { get; private set; }
-        protected int Version { get; set; }
+        protected StreamState State { get; private set; }
 
         public EventSourcedAggregate()
         {
-            Version = 0;
             Changes = new List<DomainEvent>();
+        }
+
+        public EventSourcedAggregate(EventStream eventStream)
+        {
+            Changes = new List<DomainEvent>();
+
+            State = eventStream.State;
+            Replay(eventStream.Events);
         }
 
         public EventStream GetChanges()
         {
-            var eventStream = new EventStream(Changes, Version, this.Id);
+            var eventStream = new EventStream(Changes, State);
 
             return eventStream; 
         }
+        protected abstract void Replay(IEnumerable<DomainEvent> changes);
     }
 }

@@ -17,14 +17,14 @@ namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
             Causes(new AccountCreated(id, credit));          
         }
 
-        public PayAsYouGoAccount(EventStream eventStream)
+        public PayAsYouGoAccount(EventStream eventStream) : base(eventStream) { }
+
+        protected override void Replay(IEnumerable<DomainEvent> changes)
         {
-            foreach (var @event in eventStream.Events)
+            foreach (var @event in changes)
             {
                 When((dynamic)@event);
             }
-
-            Version = eventStream.Version;
         }
 
         public void Record(PhoneCall phoneCall, PhoneCallCosting phoneCallCosting) 

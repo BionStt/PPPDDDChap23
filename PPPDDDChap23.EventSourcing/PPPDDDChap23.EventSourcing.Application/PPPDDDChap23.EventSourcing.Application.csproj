@@ -56,10 +56,13 @@
     <Compile Include="Application\BusinessUseCases\TopUpCredit.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Infrastructure\Entity.cs" />
+    <Compile Include="Infrastructure\EventStore.cs" />
     <Compile Include="Infrastructure\EventStream.cs" />
     <Compile Include="Infrastructure\EventSourcedAggregate.cs" />
     <Compile Include="Infrastructure\DomainEvent.cs" />
+    <Compile Include="Infrastructure\EventWrapper.cs" />
     <Compile Include="Infrastructure\PayAsYouGoAccountRepository.cs" />
+    <Compile Include="Infrastructure\StreamState.cs" />
     <Compile Include="Infrastructure\ValueObject.cs" />
     <Compile Include="Model\PayAsYouGo\AccountCreated.cs" />
     <Compile Include="Model\PayAsYouGo\Allowance.cs" />

@@ -10,74 +10,31 @@ namespace PPPDDDChap23.EventSourcing.Application.Infrastructure
 {
     public class PayAsYouGoAccountRepository : IPayAsYouGoAccountRepository
     {
-        private readonly IDocumentSession _documentSession;
+        private readonly EventStore _eventStore;
 
-        public PayAsYouGoAccountRepository(IDocumentSession documentSession)
-        { 
-            _documentSession = documentSession;
+        public PayAsYouGoAccountRepository(EventStore eventStore)
+        {
+            _eventStore = eventStore;
         }
 
         public PayAsYouGoAccount FindBy(Guid id)
-        {           
-           
-            var eventStream = GetEventStreamFor(id);
+        {
+            var eventStream = _eventStore.GetEventStreamFor(typeof(PayAsYouGoAccount).Name, id);
 
-            if (eventStream.Events.Count() == 0) return null;
-
-            var payAsYouGoAccount = new PayAsYouGoAccount(GetEventStreamFor(id));
+            var payAsYouGoAccount = new PayAsYouGoAccount(eventStream);
 
             return payAsYouGoAccount;            
         }
 
-        private EventStream GetEventStreamFor(Guid id)
-        {
-            var eventStreams = (from stream in _documentSession.Query<EventStream>()
-                          .Customize(x => x.WaitForNonStaleResultsAsOfNow())
-                                where stream.AggregateId.Equals(id)
-                                orderby stream.Version
-                                select stream).ToList();
-
-            var events = new List<DomainEvent>();
-            int latestVersion = 0;
-
-            foreach (var eventStream in eventStreams)
-            {
-                events.AddRange(eventStream.Events);
-                latestVersion = eventStream.Version;
-            }
-
-            return new EventStream(events, latestVersion, id);
-        }
-
         public void Add(PayAsYouGoAccount payAsYouGoAccount)
         {
-            Save(payAsYouGoAccount);
+            _eventStore.CreateNewStream(payAsYouGoAccount.GetChanges().Events, payAsYouGoAccount.Id, typeof(PayAsYouGoAccount).Name);
         }
 
         public void Save(PayAsYouGoAccount payAsYouGoAccount)
         {
-            var changes = payAsYouGoAccount.GetChanges();
-
-            var versionId = LastStreamVersionPersisted(payAsYouGoAccount.Id);
-
-            if (versionId == changes.Version)
-            {
-                _documentSession.Store(new EventStream(changes.Events, versionId + 1, payAsYouGoAccount.Id));
-            }                        
+            _eventStore.AppendEventsToStream(payAsYouGoAccount.GetChanges());                      
         }
 
-        private int LastStreamVersionPersisted(Guid id)
-        {         
-            var lastEventStream = (from stream in _documentSession.Query<EventStream>()
-                                    .Customize(x => x.WaitForNonStaleResultsAsOfNow())
-                                   where stream.AggregateId.Equals(id)
-                                   orderby stream.Version
-                                   select stream).LastOrDefault();
-
-            if (lastEventStream != null)
-                return lastEventStream.Version;
-            else            
-                return 0;            
-        }
     }
 }
