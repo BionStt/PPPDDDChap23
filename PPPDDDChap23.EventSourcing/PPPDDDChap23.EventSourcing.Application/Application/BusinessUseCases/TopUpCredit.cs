@@ -10,12 +10,15 @@ namespace PPPDDDChap23.EventSourcing.Application.Application.BusinessUseCases
     {
         private IPayAsYouGoAccountRepository _payAsYouGoAccountRepository;
         private IDocumentSession _unitOfWork;
+        private IClock _clock;
 
         public TopUpCredit(IPayAsYouGoAccountRepository payAsYouGoAccountRepository,
-                           IDocumentSession unitOfWork)
+                           IDocumentSession unitOfWork,
+                           IClock clock)
         {
             _payAsYouGoAccountRepository = payAsYouGoAccountRepository;
             _unitOfWork = unitOfWork;
+            _clock = clock;
         }
 
         public void Execute(Guid id, decimal amount)
@@ -26,7 +29,7 @@ namespace PPPDDDChap23.EventSourcing.Application.Application.BusinessUseCases
 
                 var credit = new Money(amount);
 
-                account.TopUp(credit); 
+                account.TopUp(credit, _clock); 
 
                 _payAsYouGoAccountRepository.Save(account);
                                                

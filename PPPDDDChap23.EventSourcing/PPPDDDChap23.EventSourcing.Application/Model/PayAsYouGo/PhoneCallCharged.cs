@@ -9,17 +9,17 @@ namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
 {
     public class PhoneCallCharged : DomainEvent
     {
-        public PhoneCallCharged(Guid aggregateId, PhoneCall phoneCall, Money costOfCall, int numberOfMinutesCoveredByAllowance) : base (aggregateId)
+        public PhoneCallCharged(Guid aggregateId, PhoneCall phoneCall, Money costOfCall, Minutes coveredByAllowance) : base (aggregateId)
         {
             PhoneCall = phoneCall;
             CostOfCall = costOfCall;
-            NumberOfMinutesCoveredByAllowance = numberOfMinutesCoveredByAllowance;
+            CoveredByAllowance = coveredByAllowance;
         }
 
         public PhoneCall PhoneCall { get; private set; }
 
         public Money CostOfCall { get; private set; }
 
-        public int NumberOfMinutesCoveredByAllowance { get; private set; }
+        public Minutes CoveredByAllowance { get; private set; }
     }
 }

@@ -27,6 +27,7 @@ namespace PPPDDDChap23.EventSourcing.Application
             ObjectFactory.Initialize(config =>
             {
                 config.For<IPayAsYouGoAccountRepository>().Use<PayAsYouGoAccountRepository>();
+                config.For<IClock>().Use<SystemClock>();
                
                 config.For<IDocumentStore>().Use(documentStore);
                 config.For<IDocumentSession>()

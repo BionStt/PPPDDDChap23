@@ -47,6 +47,11 @@ namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
             return new Money(this.Amount - money.Amount);
         }
 
+        public Money MultiplyBy(int number)
+        {
+            return new Money(this.Amount * number);
+        }
+
         protected override IEnumerable<object> GetAttributesToIncludeInEqualityCheck()
         {
             return new List<Object>() { Amount };

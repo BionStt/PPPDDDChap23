@@ -8,15 +8,15 @@ namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
 {
     public class PhoneCall
     {
-        public PhoneCall(PhoneNumber numberDialled, DateTime callStart, int callLengthInMinutes)
+        public PhoneCall(PhoneNumber numberDialled, DateTime callStart, Minutes callLength)
         {
             NumberDialled = numberDialled;
-            Minutes = callLengthInMinutes;
+            Minutes = callLength;
             StartTime = callStart;
         }
 
         public DateTime StartTime {get; private set;} 
-        public int Minutes {get; private set;}
+        public Minutes Minutes {get; private set;}
         public PhoneNumber NumberDialled { get; private set; }
     }
 }

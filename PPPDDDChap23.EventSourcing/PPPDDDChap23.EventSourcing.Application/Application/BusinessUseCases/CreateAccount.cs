@@ -24,7 +24,7 @@ namespace PPPDDDChap23.EventSourcing.Application.Application.BusinessUseCases
 
         public void Execute(Guid id)
         {
-            var payAsYouGoAccount = new PayAsYouGoAccount(id, new Money());
+            var payAsYouGoAccount = new PayAsYouGoAccount(id, new Money(10m));
 
             _payAsYouGoAccountRepository.Add(payAsYouGoAccount);
 

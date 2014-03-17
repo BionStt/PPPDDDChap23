@@ -35,10 +35,15 @@ namespace PPPDDDChap23.EventSourcing.Presentation
 
             var topUpCredit = ObjectFactory.GetInstance<TopUpCredit>();
 
-            topUpCredit.Execute(id, 10m);
+            topUpCredit.Execute(id, 20m);
 
             Console.WriteLine("Hit any key to continue");
             Console.ReadLine();
+
+            Console.WriteLine("Record call");
+            Console.WriteLine();
+            
+            recordPhoneCall.Execute(id, "07789923557", DateTime.Now, 100); 
 
         }
     }

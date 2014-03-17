@@ -61,12 +61,14 @@
     <Compile Include="Infrastructure\EventSourcedAggregate.cs" />
     <Compile Include="Infrastructure\DomainEvent.cs" />
     <Compile Include="Infrastructure\EventWrapper.cs" />
+    <Compile Include="Infrastructure\IClock.cs" />
     <Compile Include="Infrastructure\PayAsYouGoAccountRepository.cs" />
     <Compile Include="Infrastructure\StreamState.cs" />
+    <Compile Include="Infrastructure\SystemClock.cs" />
     <Compile Include="Infrastructure\ValueObject.cs" />
     <Compile Include="Model\PayAsYouGo\AccountCreated.cs" />
-    <Compile Include="Model\PayAsYouGo\Allowance.cs" />
     <Compile Include="Model\PayAsYouGo\IPayAsYouGoAccountRepository.cs" />
+    <Compile Include="Model\PayAsYouGo\Minutes.cs" />
     <Compile Include="Model\PayAsYouGo\Money.cs" />
     <Compile Include="Model\PayAsYouGo\CreditAdded.cs" />
     <Compile Include="Model\PayAsYouGo\CreditSatisfiesFreeCallAllowanceOffer.cs" />

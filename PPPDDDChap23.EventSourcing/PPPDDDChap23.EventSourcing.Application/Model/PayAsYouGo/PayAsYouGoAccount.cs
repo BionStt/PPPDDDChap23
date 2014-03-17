@@ -11,6 +11,7 @@ namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
     {
         private FreeCallAllowance _freeCallAllowance;
         private Money _credit;
+        private PayAsYouGoInclusiveMinutesOffer _InclusiveMinutesOffer = new PayAsYouGoInclusiveMinutesOffer();
 
         public PayAsYouGoAccount(Guid id, Money credit)
         {
@@ -27,22 +28,24 @@ namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
             }
         }
 
-        public void Record(PhoneCall phoneCall, PhoneCallCosting phoneCallCosting) 
-        {       
-            var numberOfMinutesCoveredByAllowance = 0;
+        public void Record(PhoneCall phoneCall, PhoneCallCosting phoneCallCosting, IClock clock) 
+        {
+            var numberOfMinutesCoveredByAllowance = new Minutes();
       
             if (_freeCallAllowance != null)
-                numberOfMinutesCoveredByAllowance = _freeCallAllowance.MinutesWhichCanCover(phoneCall);
+                numberOfMinutesCoveredByAllowance = _freeCallAllowance.MinutesWhichCanCover(phoneCall, clock);
 
-            var costOfCall = phoneCallCosting.DetermineCostOfCall(phoneCall, numberOfMinutesCoveredByAllowance);
+            var numberOfMinutesToChargeFor = phoneCall.Minutes.Subtract(numberOfMinutesCoveredByAllowance);
+
+            var costOfCall = phoneCallCosting.DetermineCostOfCall(numberOfMinutesToChargeFor);
 
             Causes(new PhoneCallCharged(this.Id, phoneCall, costOfCall, numberOfMinutesCoveredByAllowance));
         }
 
-        public void TopUp(Money credit)
+        public void TopUp(Money credit, IClock clock)
         {
-            if (new PayAsYouGoInclusiveMinutesOffer().IsSatisfiedBy(credit))            
-                Causes(new CreditSatisfiesFreeCallAllowanceOffer(this.Id));            
+            if (_InclusiveMinutesOffer.IsSatisfiedBy(credit))
+                Causes(new CreditSatisfiesFreeCallAllowanceOffer(this.Id, clock.Time(), _InclusiveMinutesOffer.FreeMinutes));            
 
             Causes(new CreditAdded(this.Id, credit));
         }
@@ -60,7 +63,7 @@ namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
 
         private void When(CreditSatisfiesFreeCallAllowanceOffer creditSatisfiesFreeCallAllowanceOffer)
         {
-            _freeCallAllowance = new FreeCallAllowance();
+            _freeCallAllowance = new FreeCallAllowance(creditSatisfiesFreeCallAllowanceOffer.FreeMinutes, creditSatisfiesFreeCallAllowanceOffer.OfferSatisfied);
         }
 
         private void When(PhoneCallCharged phoneCallCharged)
@@ -68,7 +71,7 @@ namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
             _credit = _credit.Subtract(phoneCallCharged.CostOfCall);
 
             if (_freeCallAllowance != null)
-                _freeCallAllowance.Subtract(phoneCallCharged.NumberOfMinutesCoveredByAllowance);
+                _freeCallAllowance.Subtract(phoneCallCharged.CoveredByAllowance);
         }
 
         private void When(AccountCreated accountCreated)
