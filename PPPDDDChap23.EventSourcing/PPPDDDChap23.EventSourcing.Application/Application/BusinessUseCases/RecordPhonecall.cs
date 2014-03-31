@@ -14,12 +14,14 @@ namespace PPPDDDChap23.EventSourcing.Application.Application.BusinessUseCases
     {
         private IPayAsYouGoAccountRepository _payAsYouGoAccountRepository;
         private IDocumentSession _unitOfWork;
+        private IClock _clock;
 
         public RecordPhonecall(IPayAsYouGoAccountRepository payAsYouGoAccountRepository,
-                           IDocumentSession unitOfWork)
+                           IDocumentSession unitOfWork, IClock clock)
         {
             _payAsYouGoAccountRepository = payAsYouGoAccountRepository;
             _unitOfWork = unitOfWork;
+            _clock = clock;
         }
 
         public void Execute(Guid id, string phoneNumber, DateTime callStart, int callLengthInMinutes)
@@ -28,9 +30,9 @@ namespace PPPDDDChap23.EventSourcing.Application.Application.BusinessUseCases
                 var payAsYouGoAccount = _payAsYouGoAccountRepository.FindBy(id);
 
                 var numberDialled = new PhoneNumber(phoneNumber);
-                var phoneCall = new PhoneCall(numberDialled, callStart, callLengthInMinutes);
+                var phoneCall = new PhoneCall(numberDialled, callStart, new Minutes(callLengthInMinutes));
 
-                payAsYouGoAccount.Record(phoneCall, new PhoneCallCosting());
+                payAsYouGoAccount.Record(phoneCall, new PhoneCallCosting(), _clock);
 
                 _payAsYouGoAccountRepository.Save(payAsYouGoAccount);
 
