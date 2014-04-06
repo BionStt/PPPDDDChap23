@@ -8,19 +8,17 @@ namespace PPPDDDChap23.EventSourcing.Application.Infrastructure
 {
     public class EventWrapper
     {
+        public string Id { get; private set; }
         public DomainEvent Event { get; private set; }
-        public Guid StreamStateId { get; private set; }
-        public string AggregateType {get; private set;}
-        public Guid AggregateId { get; private set; }
+        public string EventStreamId { get; private set; }
         public int EventNumber { get; private set; }
 
-        public EventWrapper(DomainEvent @event, Guid aggregateId, string aggregateType, int eventNumber, Guid streamStateId)
+        public EventWrapper(DomainEvent @event, int eventNumber, string streamStateId)
         {
-            Event = @event;
-            AggregateType = aggregateType;
-            AggregateId = aggregateId;
+            Event = @event;     
             EventNumber = eventNumber;
-            StreamStateId = streamStateId;
+            EventStreamId = streamStateId;
+            Id = string.Format("{0}-{1}", streamStateId, EventNumber);
         }
     }
 }

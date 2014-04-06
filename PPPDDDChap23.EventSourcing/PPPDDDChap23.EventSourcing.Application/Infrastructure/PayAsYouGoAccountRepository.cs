@@ -19,21 +19,38 @@ namespace PPPDDDChap23.EventSourcing.Application.Infrastructure
 
         public PayAsYouGoAccount FindBy(Guid id)
         {
-            var eventStream = _eventStore.GetEventStreamFor(typeof(PayAsYouGoAccount).Name, id);
+            var streamName = string.Format("{0}-{1}", typeof(PayAsYouGoAccount).Name, id.ToString());
 
-            var payAsYouGoAccount = new PayAsYouGoAccount(eventStream);
+            // Check for snapshots
+
+            var fromEventNumber = 0;
+            var toEventNumber = int.MaxValue ;
+
+            // pull back all events from snapshot
+            var stream = _eventStore.GetStream(streamName, fromEventNumber, toEventNumber);
+
+            var payAsYouGoAccount = new PayAsYouGoAccount();
+
+            foreach(var @event in stream)
+            {
+                payAsYouGoAccount.Apply(@event);
+            }
 
             return payAsYouGoAccount;            
         }
 
         public void Add(PayAsYouGoAccount payAsYouGoAccount)
         {
-            _eventStore.CreateNewStream(payAsYouGoAccount.GetChanges().Events, payAsYouGoAccount.Id, typeof(PayAsYouGoAccount).Name);
+            var streamName = string.Format("{0}-{1}", typeof(PayAsYouGoAccount).Name, payAsYouGoAccount.Id.ToString());
+
+            _eventStore.CreateNewStream(streamName, payAsYouGoAccount.Changes);
         }
 
         public void Save(PayAsYouGoAccount payAsYouGoAccount)
         {
-            _eventStore.AppendEventsToStream(payAsYouGoAccount.GetChanges());                      
+            var streamName = string.Format("{0}-{1}", typeof(PayAsYouGoAccount).Name, payAsYouGoAccount.Id.ToString());
+
+            _eventStore.AppendEventsToStream(streamName, payAsYouGoAccount.Changes);                      
         }
 
     }

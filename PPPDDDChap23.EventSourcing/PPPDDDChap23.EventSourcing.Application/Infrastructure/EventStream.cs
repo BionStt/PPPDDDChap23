@@ -8,13 +8,22 @@ namespace PPPDDDChap23.EventSourcing.Application.Infrastructure
 {
     public class EventStream
     {
-        public IEnumerable<DomainEvent> Events { get; private set; }
-        public StreamState State { get; private set; }
+        public string Id { get; private set; } //aggregate type + id
+        public int Version {get; private set;}
 
-        public EventStream(IEnumerable<DomainEvent> events, StreamState state)
+        private EventStream() { }
+
+        public EventStream(string id)
         {
-            Events = events;
-            State = state;
+            Id = id;
+            Version = 0;
+        }
+
+        public EventWrapper RegisterEvent(DomainEvent @event)
+        {
+            Version ++;
+
+            return new EventWrapper(@event, Version, Id);
         }
     }
 }

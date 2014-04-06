@@ -13,19 +13,35 @@ namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
         private Money _credit;
         private PayAsYouGoInclusiveMinutesOffer _InclusiveMinutesOffer = new PayAsYouGoInclusiveMinutesOffer();
 
+        public PayAsYouGoAccount()
+        { }
+
         public PayAsYouGoAccount(Guid id, Money credit)
         {
             Causes(new AccountCreated(id, credit));          
         }
 
-        public PayAsYouGoAccount(EventStream eventStream) : base(eventStream) { }
-
-        protected override void Replay(IEnumerable<DomainEvent> changes)
+        public PayAsYouGoAccount(PayAsYouGoAccountSnapshot snapShot)
         {
-            foreach (var @event in changes)
-            {
-                When((dynamic)@event);
-            }
+            // Restore all state
+            Version = snapShot.Version;
+        }
+
+        public override void Apply(DomainEvent @event)
+        {            
+            When((dynamic)@event);  
+            Version = Version ++;
+        }
+
+        public PayAsYouGoAccountSnapshot GetPayAsYouGoAccountSnapShot()
+        { 
+            var snapshot = new PayAsYouGoAccountSnapshot();
+
+            // Save all state
+
+            snapshot.Version = Version;
+
+            return snapshot;
         }
 
         public void Record(PhoneCall phoneCall, PhoneCallCosting phoneCallCosting, IClock clock) 
@@ -51,9 +67,9 @@ namespace PPPDDDChap23.EventSourcing.Application.Model.PayAsYouGo
         }
 
         private void Causes(DomainEvent @event)
-        {
-            When((dynamic)@event);
+        {            
             Changes.Add(@event);
+            Apply(@event);
         }
 
         private void When(CreditAdded creditAdded)

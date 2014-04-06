@@ -16,39 +16,37 @@ namespace PPPDDDChap23.EventSourcing.Application.Infrastructure
             _documentSession = documentSession;
         }
 
-        public void CreateNewStream(IEnumerable<DomainEvent> domainEvents, Guid aggregateId, string aggregateType)
+        public void CreateNewStream(string streamName, IEnumerable<DomainEvent> domainEvents)
         {
-            var state = new StreamState(aggregateId, aggregateType);
-            _documentSession.Store(state);
+            var eventStream = new EventStream(streamName);
+            _documentSession.Store(eventStream);
 
-            var eventStream = new EventStream(domainEvents, state);
-
-            AppendEventsToStream(eventStream);
+            AppendEventsToStream(streamName, domainEvents);
         }
 
-        public void AppendEventsToStream(EventStream eventStream)
+        public void AppendEventsToStream(string streamName, IEnumerable<DomainEvent> domainEvents)
         {
-            foreach (var @event in eventStream.Events)
+            var stream = _documentSession.Load<EventStream>(streamName);
+
+            foreach (var @event in domainEvents)
             {
-                _documentSession.Store(eventStream.State.RegisterEvent(@event));
+                _documentSession.Store(stream.RegisterEvent(@event));
             }
         }
 
-        public EventStream GetEventStreamFor(string aggregateType, Guid aggregateId)
+        public IEnumerable<DomainEvent> GetStream(string streamName, int fromVersion, int toVersion)
         {
+            // Get events from a specific version
             var eventWrappers = (from stream in _documentSession.Query<EventWrapper>()
-                          .Customize(x => x.WaitForNonStaleResultsAsOfNow())
-                          where stream.AggregateId.Equals(aggregateId)
-                          && stream.AggregateType.Equals(aggregateType)
-                          orderby stream.EventNumber
-                          select stream).ToList();
+                                  .Customize(x => x.WaitForNonStaleResultsAsOfNow())
+                                  where stream.EventStreamId.Equals(streamName)
+                                  && stream.EventNumber <= toVersion
+                                  && stream.EventNumber >= fromVersion
+                                  orderby stream.EventNumber
+                                  select stream).ToList();
 
             if (eventWrappers.Count() == 0) return null;
-
-            var stateId = eventWrappers.First().StreamStateId;
-
-            var state = _documentSession.Load<StreamState>("StreamStates/" + stateId);
-
+                      
             var events = new List<DomainEvent>();
 
             foreach (var @event in eventWrappers)
@@ -56,7 +54,7 @@ namespace PPPDDDChap23.EventSourcing.Application.Infrastructure
                 events.Add(@event.Event);
             }
 
-            return new EventStream(events, state);
+            return events;
         }
     }
 }
